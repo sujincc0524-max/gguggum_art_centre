@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAST EXHIBITIONS | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+  <a class="back-link" href="index.html">&larr;</a>
+  <h1 class="page-title">PAST EXHIBITIONS</h1>
+
+  <button type="button" class="gg-add-btn" data-gg-add="ggExhibitions" data-gg-add-category="past" hidden>+ 전시 추가</button>
+
+  <div class="viewall-grid" id="past-grid-all"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("exhibitions");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  function paint() {
+    ggRender.renderGrid("past-grid-all", "past");
+  }
+  paint();
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+</script>
+</body>
+</html>
