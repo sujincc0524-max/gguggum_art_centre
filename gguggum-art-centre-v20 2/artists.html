@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTISTS | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+  <h1 class="page-title">ARTISTS</h1>
+
+  <button type="button" class="gg-add-btn" data-gg-add="ggArtists" hidden>+ 아티스트 추가</button>
+
+  <section class="artists-layout">
+    <div class="artist-list" id="artist-list"></div>
+    <div class="artist-lead-photo" id="artist-lead-photo"></div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/artists.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("artists");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  // The lead photo panel auto-rotates through every artist every 5s, and
+  // hovering a name in the list jumps straight to that artist (pausing the
+  // rotation until the mouse leaves).
+  var ROTATE_INTERVAL_MS = 5000;
+  var leadPhoto = { timer: null, artists: [], index: 0 };
+
+  function renderLeadPhoto(idx) {
+    var photoEl = document.getElementById("artist-lead-photo");
+    var artists = leadPhoto.artists;
+    if (!artists.length) {
+      photoEl.innerHTML = "";
+      photoEl.removeAttribute("data-gg-item");
+      return;
+    }
+    leadPhoto.index = idx;
+    var artist = artists[idx];
+    photoEl.setAttribute("data-gg-item", "ggArtists|" + artist.id);
+    photoEl.innerHTML =
+      '<a href="artist-detail.html?id=' + artist.id + '">' +
+      (artist.photo ? '<img src="' + artist.photo + '" alt="' + artist.name + '">' : "") +
+      "</a>";
+    // The edit-pencil badge lives inside this element's innerHTML, which
+    // was just replaced — re-scan so admin mode keeps working as the
+    // panel rotates between artists.
+    if (window.ggAdmin) ggAdmin.init();
+  }
+
+  function stopLeadRotation() {
+    if (leadPhoto.timer) {
+      clearInterval(leadPhoto.timer);
+      leadPhoto.timer = null;
+    }
+  }
+
+  function startLeadRotation() {
+    stopLeadRotation();
+    if (leadPhoto.artists.length < 2) return;
+    leadPhoto.timer = setInterval(function () {
+      renderLeadPhoto((leadPhoto.index + 1) % leadPhoto.artists.length);
+    }, ROTATE_INTERVAL_MS);
+  }
+
+  function showArtistById(id) {
+    var idx = leadPhoto.artists.findIndex(function (a) { return a.id === id; });
+    if (idx > -1) renderLeadPhoto(idx);
+  }
+
+  function paintLeadPhoto() {
+    leadPhoto.artists = (window.ggArtists || []).filter(function (a) { return a.id; });
+    // Start on whichever artist actually has a photo uploaded yet, so the
+    // very first frame isn't an empty box; rotation then cycles through
+    // everyone from there.
+    var featuredIdx = leadPhoto.artists.findIndex(function (a) { return a.photo; });
+    renderLeadPhoto(featuredIdx > -1 ? featuredIdx : 0);
+    startLeadRotation();
+  }
+
+  function wireHoverPreview() {
+    var list = document.getElementById("artist-list");
+    if (!list) return;
+    list.querySelectorAll("a.artist-row").forEach(function (row) {
+      if (row.dataset.hoverBound) return;
+      row.dataset.hoverBound = "1";
+      row.addEventListener("mouseenter", function () {
+        var m = /[?&]id=([^&]+)/.exec(row.getAttribute("href") || "");
+        if (!m) return;
+        stopLeadRotation();
+        showArtistById(decodeURIComponent(m[1]));
+      });
+      row.addEventListener("mouseleave", startLeadRotation);
+    });
+  }
+
+  function paint() {
+    ggRender.renderArtistList("artist-list");
+    paintLeadPhoto();
+    wireHoverPreview();
+  }
+  paint();
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+
+  // The lead photo is a square sized to match the artist-list's full
+  // height — i.e. the span from the first artist name to the last one.
+  (function () {
+    var list = document.getElementById("artist-list");
+    var photo = document.getElementById("artist-lead-photo");
+
+    function syncPhotoSize() {
+      var h = list.getBoundingClientRect().height;
+      if (h > 0) {
+        photo.style.width = "min(" + h + "px, 100%)";
+      }
+    }
+
+    // Run on load/resize, plus a couple of rAF passes so this still lands
+    // correctly even if fonts/layout settle a frame or two late.
+    syncPhotoSize();
+    requestAnimationFrame(function () {
+      requestAnimationFrame(syncPhotoSize);
+    });
+    window.addEventListener("load", syncPhotoSize);
+    window.addEventListener("resize", syncPhotoSize);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(syncPhotoSize);
+    }
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncPhotoSize).observe(list);
+    }
+  })();
+</script>
+</body>
+</html>
