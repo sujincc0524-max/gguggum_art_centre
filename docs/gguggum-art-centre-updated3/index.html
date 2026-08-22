@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXHIBITIONS | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+
+  <!-- Current exhibition -->
+  <section class="hero">
+    <div class="hero-info">
+      <div>
+        <h1>도킹 플랫폼 : 자리찾기</h1>
+      </div>
+      <div>
+        <p class="hero-sub">꾸꿈아트센터 글로벌 아트 프로젝트</p>
+        <p class="hero-date">2026.09.22 (Tue) ~ 2026.10.11(Sun)</p>
+      </div>
+    </div>
+    <div class="hero-poster" data-gg-item="ggExhibitions|docking">
+      <a href="exhibition-detail.html?id=docking">
+        <video src="video/docking_poster.mp4" poster="img/poster_docking.png" autoplay muted loop playsinline aria-label="도킹 플랫폼 : 자리찾기"></video>
+      </a>
+    </div>
+  </section>
+
+  <!-- Past exhibitions -->
+  <section class="block">
+    <div class="section-head">
+      <h2>PAST EXHIBITIONS</h2>
+      <a class="view-all-btn" href="past-exhibitions.html">VIEW ALL
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="card-grid" id="past-grid"></div>
+  </section>
+
+  <!-- Collaborations -->
+  <section class="block">
+    <div class="section-head">
+      <h2>COLLABORATIONS</h2>
+      <a class="view-all-btn" href="collaborations.html">VIEW ALL
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="card-grid" id="collab-grid"></div>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("exhibitions");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  function paint() {
+    ggRender.renderGrid("past-grid", "past", 4);
+    ggRender.renderGrid("collab-grid", "collab", 4);
+  }
+  paint();
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+</script>
+</body>
+</html>
