@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEWS | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+  <h1 class="page-title">NEWS</h1>
+
+  <nav class="news-tabs" id="news-tabs">
+    <button type="button" class="news-tab active" data-category="film">Film</button>
+    <button type="button" class="news-tab" data-category="article">Article</button>
+    <button type="button" class="news-tab" data-category="journal">Journal</button>
+  </nav>
+
+  <button type="button" class="gg-add-btn" data-gg-add="ggNews" data-gg-add-category="film" hidden>+ 뉴스 추가</button>
+
+  <div class="news-grid" id="news-grid"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/news.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("news");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  var currentCategory = "film";
+
+  (function () {
+    var tabs = document.querySelectorAll(".news-tab");
+    var params = new URLSearchParams(window.location.search);
+    var initial = params.get("tab") || "film";
+
+    function setActive(category) {
+      currentCategory = category;
+      tabs.forEach(function (t) {
+        t.classList.toggle("active", t.dataset.category === category);
+      });
+      var addBtn = document.querySelector('[data-gg-add="ggNews"]');
+      if (addBtn) addBtn.setAttribute("data-gg-add-category", category);
+      paint();
+    }
+
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () {
+        setActive(t.dataset.category);
+      });
+    });
+
+    window.__ggNewsSetActive = setActive;
+    setActive(["film", "article", "journal"].includes(initial) ? initial : "film");
+  })();
+
+  function paint() {
+    ggRender.renderNewsList("news-grid", currentCategory);
+  }
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+</script>
+</body>
+</html>

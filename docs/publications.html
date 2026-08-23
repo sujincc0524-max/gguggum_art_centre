@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PUBLICATIONS | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="pub-banner">
+    <img src="img/publications_banner.png" alt="Publications">
+  </div>
+
+  <button type="button" class="gg-add-btn" data-gg-add="ggPublications" hidden>+ 출판물 추가</button>
+
+  <div class="pub-list" id="pub-list"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/publications.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("publications");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  function paint() {
+    ggRender.renderPublications("pub-list");
+  }
+  paint();
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+</script>
+</body>
+</html>
